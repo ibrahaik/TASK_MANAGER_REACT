@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { createTask, getTasks, deleteTask, updateTask } from "../services/taskServices"
 import type { Task } from "../types/task"
+import "./TaskListPage.css"
 
 const TaskListPage = () => {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -30,8 +31,6 @@ const TaskListPage = () => {
     try {
       await deleteTask(id)
       setTasks((prev) => prev.filter((task) => task._id !== id))
-
-      // Mostrar notificación
       showNotification("¡Tarea eliminada con éxito!", "success")
     } catch (error) {
       console.error("Error al eliminar tarea:", error)
@@ -69,7 +68,7 @@ const TaskListPage = () => {
       const tareaActualizada = await updateTask(task._id, { estado: nuevoEstado })
       setTasks((prev) => prev.map((t) => (t._id === task._id ? tareaActualizada : t)))
 
-      const mensaje = nuevoEstado === "completada" ? "¡Tarea completada! 🎉" : "Tarea marcada como pendiente"
+      const mensaje = nuevoEstado === "completada" ? "¡Tarea completada!" : "Tarea marcada como pendiente"
       showNotification(mensaje, "success")
     } catch (error) {
       console.error("Error al cambiar estado:", error)
@@ -106,18 +105,14 @@ const TaskListPage = () => {
     }
   }
 
-  // Función para mostrar notificaciones
   const showNotification = (message: string, type: "success" | "error") => {
     const notification = document.getElementById("notification")
     if (notification) {
       notification.textContent = message
-      notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-500 translate-y-0 opacity-100 ${
-        type === "success" ? "bg-green-500" : "bg-red-500"
-      }`
+      notification.className = `notification ${type}`
 
       setTimeout(() => {
-        notification.className =
-          "fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-500 translate-y-20 opacity-0"
+        notification.className = `notification hidden`
       }, 3000)
     }
   }
@@ -130,31 +125,40 @@ const TaskListPage = () => {
         task.descripcion.toLowerCase().includes(busqueda.toLowerCase()),
     )
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString("es-ES", options)
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="task-list-container">
       {/* Filtros y búsqueda */}
-      <div className="bg-white rounded-2xl shadow-xl p-6 transition-all duration-300 hover:shadow-2xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-bold text-purple-800">
-              {filtroEstado === "pendiente" ? "📝 Tareas Pendientes" : "✅ Tareas Completadas"}
+      <div className="filter-section">
+        <div className="filter-header">
+          <div className="filter-title">
+            <h2 className="section-title">
+              {filtroEstado === "pendiente" ? " Tareas Pendientes" : "✅ Tareas Completadas"}
             </h2>
-            <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-              {tareasFiltradas.length}
-            </span>
+            <span className="task-count">{tareasFiltradas.length}</span>
           </div>
 
-          <div className="relative">
+          <div className="search-container">
             <input
               type="text"
               placeholder="Buscar tareas..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-10 pr-4 py-2 border-2 border-purple-200 rounded-full w-full md:w-64 focus:outline-none focus:border-purple-500 transition-colors"
+              className="search-input"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+              className="search-icon"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -169,64 +173,53 @@ const TaskListPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="filter-buttons">
           <button
             onClick={() => setFiltroEstado("pendiente")}
-            className={`px-4 py-2 rounded-full font-medium transition-all ${
-              filtroEstado === "pendiente"
-                ? "bg-purple-600 text-white shadow-md"
-                : "bg-purple-100 text-purple-700 hover:bg-purple-200"
-            }`}
+            className={`filter-button ${filtroEstado === "pendiente" ? "active-pending" : ""}`}
           >
-            📝 Pendientes
+            Pendientes
           </button>
           <button
             onClick={() => setFiltroEstado("completada")}
-            className={`px-4 py-2 rounded-full font-medium transition-all ${
-              filtroEstado === "completada"
-                ? "bg-green-600 text-white shadow-md"
-                : "bg-green-100 text-green-700 hover:bg-green-200"
-            }`}
+            className={`filter-button ${filtroEstado === "completada" ? "active-completed" : ""}`}
           >
-            ✅ Completadas
+            Completadas
           </button>
         </div>
       </div>
 
       {/* Formulario para crear tarea */}
-      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-xl p-6 transition-all duration-300">
-        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span className="animate-pulse">✨</span> Nueva Tarea
+      <div className="create-task-form">
+        <h2 className="form-title">
+          <span className="form-icon">+</span> Nueva Tarea
         </h2>
 
-        <div className="space-y-4">
-          <div>
+        <div className="form-fields">
+          <div className="form-field">
             <input
               type="text"
               placeholder="¿Qué necesitas hacer?"
               value={nuevoNombre}
               onChange={(e) => setNuevoNombre(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white bg-white/90 backdrop-blur-sm shadow-inner"
+              className="task-input"
             />
           </div>
 
-          <div>
+          <div className="form-field">
             <textarea
               placeholder="Describe los detalles de tu tarea..."
               value={nuevoDescripcion}
               onChange={(e) => setNuevoDescripcion(e.target.value)}
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white bg-white/90 backdrop-blur-sm shadow-inner resize-none"
+              className="task-textarea"
             ></textarea>
           </div>
 
-          <button
-            onClick={handleCrearTarea}
-            className="w-full bg-white text-purple-600 font-bold py-3 px-6 rounded-lg hover:bg-purple-50 transition-colors duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-          >
+          <button onClick={handleCrearTarea} className="create-button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
+              className="button-icon"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -239,18 +232,18 @@ const TaskListPage = () => {
       </div>
 
       {/* Lista de tareas */}
-      <div className="space-y-4">
+      <div className="tasks-container">
         {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
           </div>
         ) : tareasFiltradas.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow p-8 text-center">
-            <div className="text-6xl mb-4">{filtroEstado === "pendiente" ? "🎯" : "🎉"}</div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">
-              {filtroEstado === "pendiente" ? "¡No hay tareas pendientes!" : "¡No hay tareas completadas!"}
+          <div className="empty-state">
+            <div className="empty-icon">{filtroEstado === "pendiente" ? "📋" : "✅"}</div>
+            <h3 className="empty-title">
+              {filtroEstado === "pendiente" ? "No hay tareas pendientes" : "No hay tareas completadas"}
             </h3>
-            <p className="text-gray-500">
+            <p className="empty-message">
               {filtroEstado === "pendiente"
                 ? "Crea una nueva tarea para comenzar"
                 : "Completa algunas tareas para verlas aquí"}
@@ -260,79 +253,65 @@ const TaskListPage = () => {
           tareasFiltradas.map((task) => (
             <div
               key={task._id}
-              className={`bg-white rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border-l-4 ${
-                task.estado === "pendiente" ? "border-purple-500" : "border-green-500"
-              }`}
+              className={`task-card ${task.estado === "pendiente" ? "task-pending" : "task-completed"}`}
             >
               {editingTask === task._id ? (
                 // Modo edición
-                <div className="space-y-4">
+                <div className="edit-form">
                   <input
                     type="text"
                     value={editFormData.nombre}
                     onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="edit-input"
                   />
 
                   <textarea
                     value={editFormData.descripcion}
                     onChange={(e) => setEditFormData({ ...editFormData, descripcion: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2 rounded-lg border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                    className="edit-textarea"
                   ></textarea>
 
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleSaveEdit(task._id)}
-                      className="flex-1 bg-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors"
-                    >
+                  <div className="edit-actions">
+                    <button onClick={() => handleSaveEdit(task._id)} className="save-button">
                       Guardar
                     </button>
-                    <button
-                      onClick={handleCancelEdit}
-                      className="flex-1 bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
-                    >
+                    <button onClick={handleCancelEdit} className="cancel-button">
                       Cancelar
                     </button>
                   </div>
                 </div>
               ) : (
                 // Modo visualización
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-gray-800 break-words pr-4">{task.nombre}</h3>
-                    <span className="text-xs text-gray-500 whitespace-nowrap">
-                      {new Date(task.fecha).toLocaleDateString()}
-                    </span>
+                <div className="task-content">
+                  <div className="task-header">
+                    <h3 className="task-title">{task.nombre}</h3>
+                    <span className="task-date">{formatDate(task.fecha)}</span>
                   </div>
 
-                  <p className="text-gray-600 mb-4 break-words">{task.descripcion}</p>
+                  <p className="task-description">{task.descripcion}</p>
 
-                  <div className="flex flex-wrap gap-2 justify-between items-center">
-                    <div>
+                  <div className="task-footer">
+                    <div className="task-status">
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          task.estado === "pendiente" ? "bg-purple-100 text-purple-800" : "bg-green-100 text-green-800"
-                        }`}
+                        className={`status-badge ${task.estado === "pendiente" ? "status-pending" : "status-completed"}`}
                       >
                         {task.estado === "pendiente" ? "Pendiente" : "Completada"}
                       </span>
                     </div>
 
-                    <div className="flex gap-1">
+                    <div className="task-actions">
                       <button
                         onClick={() => handleToggleStatus(task)}
-                        className={`p-2 rounded-full ${
-                          task.estado === "pendiente"
-                            ? "bg-green-100 text-green-600 hover:bg-green-200"
-                            : "bg-purple-100 text-purple-600 hover:bg-purple-200"
-                        } transition-colors`}
+                        className={`action-button ${
+                          task.estado === "pendiente" ? "toggle-complete" : "toggle-pending"
+                        }`}
                         title={task.estado === "pendiente" ? "Marcar como completada" : "Marcar como pendiente"}
                       >
                         {task.estado === "pendiente" ? (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
+                            className="action-icon"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -342,7 +321,7 @@ const TaskListPage = () => {
                         ) : (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
+                            className="action-icon"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -359,12 +338,12 @@ const TaskListPage = () => {
 
                       <button
                         onClick={() => handleStartEdit(task)}
-                        className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
+                        className="action-button edit-button"
                         title="Editar tarea"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="action-icon"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -384,12 +363,12 @@ const TaskListPage = () => {
                             handleEliminar(task._id)
                           }
                         }}
-                        className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                        className="action-button delete-button"
                         title="Eliminar tarea"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
+                          className="action-icon"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -412,10 +391,7 @@ const TaskListPage = () => {
       </div>
 
       {/* Notificación */}
-      <div
-        id="notification"
-        className="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white transform transition-all duration-500 translate-y-20 opacity-0"
-      ></div>
+      <div id="notification" className="notification hidden"></div>
     </div>
   )
 }

@@ -21,4 +21,3 @@ export const updateTask = async (id: string, data: Partial<Task>): Promise<Task>
   const res = await axios.put(`${API_URL}/${id}`, data);
   return res.data;
 };
-// Puedes añadir aquí también createTask, updateTask, etc.
