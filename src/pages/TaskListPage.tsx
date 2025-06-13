@@ -61,7 +61,7 @@ const handleEditar = async (id: string) => {
   return (
 
     
-    <div>
+<div className="bg-red-200 p-4 rounded-lg shadow-md">
           <h2>Lista de tareas</h2>
 
       <div>
