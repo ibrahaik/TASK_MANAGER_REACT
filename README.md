@@ -1,54 +1,96 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 📋 Spark Note - Gestor de Tareas
 
-Currently, two official plugins are available:
+**Spark Note** es una aplicación de gestión de tareas construida con **React**, **TypeScript** y **Vite**. Permite a los usuarios crear, editar, filtrar, marcar y eliminar tareas fácilmente, todo en una interfaz moderna y responsiva.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Características principales
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- ✅ Crear y gestionar tareas con nombre, descripción y fecha.
+- 🔄 Cambiar el estado de las tareas entre pendientes y completadas.
+- 🔍 Filtro de tareas por estado y búsqueda por nombre o descripción.
+- ✏️ Edición en línea de tareas.
+- 🗑️ Eliminación rápida de tareas.
+- 🧾 Notificaciones visuales de éxito/error.
+- 🧑‍💻 Interfaz atractiva y responsiva con animaciones y estilos personalizados.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## 🧰 Tecnologías utilizadas
+
+- ⚛️ React 19 + TypeScript
+- ⚡ Vite (como bundler)
+- 🎨 CSS personalizado + diseño responsivo
+- 📦 Axios para peticiones HTTP
+- 🧪 ESLint y TypeScript para calidad de código
+- 💚 Tailwind CSS (PostCSS plugin)
+
+---
+
+## 📁 Estructura del proyecto
+
+```
+ibrahaik-task_manager_react/
+├── src/
+│   ├── App.tsx
+│   ├── index.css
+│   ├── pages/
+│   │   └── TaskListPage.tsx
+│   ├── services/
+│   │   └── taskServices.ts
+│   └── types/
+│       └── task.ts
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🔧 Instalación y uso
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/ibrahaik/ibrahaik-task_manager_react.git
+cd ibrahaik-task_manager_react
 ```
+
+2. Instalar dependencias:
+
+```bash
+npm install
+```
+
+3. Iniciar la app en modo desarrollo:
+
+```bash
+npm run dev
+```
+
+> Asegúrate de tener el backend corriendo en `http://localhost:5000`.
+
+---
+
+## 🌐 API del Backend
+
+- `GET /` → Obtener todas las tareas
+- `POST /` → Crear nueva tarea
+- `PUT /:id` → Actualizar una tarea
+- `DELETE /:id` → Eliminar una tarea
+
+> El backend debe estar previamente configurado y en funcionamiento.
+
+---
+
+## ✨ Demo visual
+
+- Animaciones suaves, scroll personalizado y UI moderna.
+- Componentes reutilizables con lógica clara y separación por capas.
+
+
+Ibrahim Haik*
+🔗 [LinkedIn](https://es.linkedin.com/in/ibrahim-haik-a12654226) / [GitHub](https://github.com/ibrahaik)
+
